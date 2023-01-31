@@ -1,47 +1,49 @@
 import java.time.LocalDate;
 import java.util.*;
 
+import Exception.TaskNotFoundException;
+
+
 public class TaskService {
 
     private final Map<Integer, Task> taskMap;
-    private final List<Task> removedTask=new ArrayList<>();
+    Collection<Task> removedTask = new ArrayList<>();
 
     public TaskService() {
-        this.taskMap = new TreeMap<>();
+        this.taskMap = new HashMap<>();
 
     }
 
-    public void add(Task task) throws IncorrectArgumentException {
+    public void add(Task task) {
 
-            taskMap.put(Task.getId(), task);
-            removedTask.add(task);
+        taskMap.put(task.getId(), task);
 
 
     }
 
-    public Task remove(Integer id) throws TaskNotFoundException {
-        if (!taskMap.containsKey(id) || taskMap.get(id) == null) {
-            throw new TaskNotFoundException();
+    public void remove(int id) throws TaskNotFoundException {
+        if (taskMap.containsKey(id)) {
+            taskMap.remove(id);
+            System.out.println("Задача удалена");
+        } else {
+            throw new TaskNotFoundException(id);
         }
 
-        taskMap.remove(id);
-        removedTask.remove(id);
-        return taskMap.get(id);
     }
 
-    public List<Task> getAllByDate(LocalDate localDate) {
-List <Task> list=new LinkedList<>();
-        for (Map.Entry<Integer,Task> itr: taskMap.entrySet() ) {
-            if (itr.getValue().getDateTime().equals(localDate)) {
-                list.add(itr.getValue());
+    public Collection<Task> getAllByDate(LocalDate localDate) {
+        Collection<Task> removedTask = new ArrayList<>();
+        for (Task task : taskMap.values()) {
+            if (task.appearlsn(localDate)) {
+                removedTask.add(task);
             }
         }
-
-        return list;
+        return removedTask;
     }
 
     @Override
     public String toString() {
-        return  ""+taskMap;
+        return taskMap.values().toString();
+
     }
 }

@@ -1,7 +1,7 @@
 public enum Type {
     WORK("Рабочий"),
     PERSONAL("Личный");
-    private String type;
+    private final String type;
 
     Type(String type) {
         this.type = type;

@@ -1,26 +1,30 @@
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class Task <T extends TaskService> {
-    private static final AtomicInteger idGenerator = new AtomicInteger(1);
+import Exception.IncorrectArgumentException;
+
+import static java.time.format.DateTimeFormatter.*;
+import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
+
+
+public abstract class Task implements CheckRepeatTask {
+    private static int ID_GENERATOR = 1;
     private String title;
     private Type type;
-    private static Integer id ;
-    private LocalDate date;
+    private int id;
+    private LocalDateTime dateTime;
     private String description;
 
 
-
-    public Task(String title, Type type, LocalDate date, String description) {
-        this.title = title;
-        this.type = type;
-        this.date = date;
-        this.description = description;
-        id = idGenerator.getAndIncrement();
+    public Task(String title, Type type, LocalDateTime dateTime, String description) throws IncorrectArgumentException {
+        setTitle(title);
+        setType(type);
+        setDateTime(dateTime);
+        setDescription(description);
+        id = ID_GENERATOR++;
     }
-
-    public abstract boolean appearlsn(LocalDate dateTime);
 
 
     public String getTitle() {
@@ -31,12 +35,12 @@ public abstract class Task <T extends TaskService> {
         return type;
     }
 
-    public static Integer getId() throws IncorrectArgumentException {
+    public int getId() {
         return id;
     }
 
-    public LocalDate getDateTime() {
-        return date;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
     public String getDescription() {
@@ -44,15 +48,36 @@ public abstract class Task <T extends TaskService> {
     }
 
     public void setTitle(String title) throws IncorrectArgumentException {
-        this.title = title;
+        if (!title.isBlank()) {
+            this.title = title;
+        } else {
+            throw new IncorrectArgumentException("заголовке");
+        }
+
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescription(String description) throws IncorrectArgumentException {
+        if (!description.isBlank()) {
+            this.description = description;
+        } else {
+            throw new IncorrectArgumentException("теле задачи");
+        }
     }
 
-    public void setDateTime(LocalDate date) {
-        this.date = date;
+    public void setDateTime(LocalDateTime dateTime) throws IncorrectArgumentException {
+        if (dateTime != null) {
+            this.dateTime = dateTime;
+        } else {
+            throw new IncorrectArgumentException("дате и времени задачи");
+        }
+    }
+
+    public void setType(Type type) throws IncorrectArgumentException {
+        if (type != null) {
+            this.type = type;
+        } else {
+            throw new IncorrectArgumentException("типе задачи");
+        }
     }
 
     @Override
@@ -60,19 +85,21 @@ public abstract class Task <T extends TaskService> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(title, task.title) && Objects.equals(type, task.type) && Objects.equals(date, task.date) && Objects.equals(description, task.description);
+        return Objects.equals(title, task.title) && Objects.equals(type, task.type) && Objects.equals(dateTime, task.dateTime) && Objects.equals(description, task.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, type, date, description);
+        return Objects.hash(title, type, dateTime, description);
     }
 
     @Override
     public String toString() {
+
         return "\nЗадание: " + title +
                 ", " + type.getType() +
-                ", дата: " + date +
+                ", дата: " + dateTime.format(ISO_LOCAL_DATE) +
+                ", время: " + dateTime.toLocalTime().withNano(0) +
                 ", текст: " + description;
     }
 }
