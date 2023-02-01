@@ -14,7 +14,6 @@ public class Functional {
         String text = sc.nextLine();
         arrayText = Arrays.asList(text.split(" "));
         sort(arrayText);
-        System.out.println(arrayText);
         System.out.println("В тексте " + (arrayText.size()) + " слов");
         for (int i = 0; i <= arrayText.size() - 1; i++) {
             Integer oldCount = occurrences.get(arrayText.get(i));
@@ -23,12 +22,10 @@ public class Functional {
             }
             occurrences.put(arrayText.get(i), oldCount + 1);
         }
-        for (Map.Entry<String, Integer> word : occurrences.entrySet()) {
-            for (Integer index = 10; index >= 0; index--) {
-                if (word.getValue().equals(index)) {
-                    System.out.println(word);
-                }
-            }
+        List<Map.Entry<String, Integer>> word = new LinkedList(occurrences.entrySet());
+        word.sort(Collections.reverseOrder(Map.Entry.comparingByValue()));
+        for (Map.Entry<String, Integer> words : word) {
+            System.out.println(words.getValue() + " — " + words.getKey());
         }
     }
 }
